@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id         String         @id @default(cuid())
+  userName   String
+  topic      String
+  score      Int
+  difficulty String
+  createdAt  DateTime       @default(now())
+  image      String //push
+  questions  GameQuestion[]
+  GameScores GameScores[]
+}
+
+model GameQuestion {
+  id            String       @id @default(cuid())
+  gameId        String
+  question      String
+  answers       String[]
+  correctAnswer Int
+  explanation   String
+  references    References[]
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
+
+model References {
+  id             String        @id @default(cuid())
+  gameQuestionId String
+  refrenceName   String
+  link           String
+  GameQuestion   GameQuestion? @relation(fields: [gameQuestionId], references: [id], onDelete: Cascade)
+}
+
+model GameScores {
+  id       String @id @default(cuid())
+  gameId   String
+  userName String
+  score    Int
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
